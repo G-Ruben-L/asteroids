@@ -5,6 +5,7 @@ from asteroid import *
 from asteroidfield import *
 from shot import *
 
+
 def main():
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -27,6 +28,14 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
+        # Get key states
+        keys = pygame.key.get_pressed()
+
+        # Handle player input
+        if keys[pygame.K_SPACE] and player.timer <= 0:
+            new_shot = player.shoot()
+            shots.add(new_shot)
+            player.timer = PLAYER_SHOOT_COOLDOWN
 
         screen.fill("black")
         updatable.update(dt)

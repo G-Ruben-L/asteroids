@@ -1,15 +1,17 @@
 import pygame
+import math  # Add this line here
 from circleshape import CircleShape
 from constants import *
 from shot import *
 
+
 class Player(CircleShape):
     def __init__(self, x, y):
-        super().__init__(x, y, PLAYER_RADIUS)  # Always call the parent constructor first.
-        self.position = pygame.Vector2(x, y)  # Initialize self.position right here.
-        self.rotation = 0  # Then handle additional fields like rotation.
+        super().__init__(x, y, PLAYER_RADIUS)
+        self.position = pygame.Vector2(x, y)
+        self.rotation = 0
+        self.timer = 0  # Initialize timer
 
-    # in the player class
     def triangle(self):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
         right = pygame.Vector2(0, 1).rotate(self.rotation + 90) * self.radius / 1.5
@@ -29,7 +31,11 @@ class Player(CircleShape):
         self.position += forward * PLAYER_SPEED * dt
 
     def update(self, dt):
+        if self.timer > 0:
+            self.timer -= dt
+
         keys = pygame.key.get_pressed()
+
         if keys[pygame.K_a]:
             self.rotate(-dt)
         if keys[pygame.K_d]:
@@ -38,24 +44,13 @@ class Player(CircleShape):
             self.move(dt)
         if keys[pygame.K_s]:
             self.move(-dt)
-        if keys[pygame.K_SPACE]:
+        if keys[pygame.K_SPACE] and self.timer <= 0:  # Check timer
             self.shoot()
+            self.timer = PLAYER_SHOOT_COOLDOWN  # Add this line
 
     def shoot(self):
-        new_shot = Shot(self.position.x, self.position.y)
-
-        # Just calculate the forward direction once
-        direction = pygame.Vector2(0, 1).rotate(self.rotation)
-
-        # Scale it by the shooting speed
-        direction *= PLAYER_SHOOT_SPEED
-
-        # Set the shot's velocity
-        new_shot.velocity = direction
-
-
-
-
-
-
-
+        forward = pygame.Vector2(0, 1).rotate(self.rotation)
+        front_pos = self.position + forward * self.radius
+        shot = Shot(front_pos.x, front_pos.y)
+        shot.velocity = forward * PLAYER_SHOOT_SPEED
+        return shot
