@@ -6,7 +6,7 @@ from asteroidfield import *
 from shot import *
 
 
-def main():
+def main() -> None:
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     clock = pygame.time.Clock()
@@ -39,6 +39,13 @@ def main():
 
         screen.fill("black")
         updatable.update(dt)
+
+        # Shot killing asteroid block
+        for asteroid in asteroids:
+            for shot in shots:
+                if shot.collides_with(asteroid):
+                    shot.kill()
+                    asteroid.kill()
 
         # Collision detection block
         for asteroid in asteroids:
